@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="eu" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gida Interaktiboa: Glizerina Xaboi Gardena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        
+        /* Custom Gradient Backgrounds */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 50%, #3b82f6 100%);
+        }
+        .bg-gradient-accent {
+            background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #0d9488, #2563eb);
+        }
+
+        /* Timeline Line */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 28px;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, #bae6fd, #93c5fd, #a7f3d0);
+            border-radius: 4px;
+            z-index: 0;
+        }
+        @media (min-width: 768px) {
+            .timeline-container::before {
+                left: 50%;
+                margin-left: -2px;
+            }
+        }
+
+        /* Animations */
+        .step-card {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .step-card.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Completed State Styles */
+        .step-completed .card-content {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+        .step-completed .step-title {
+            text-decoration: line-through;
+            color: #64748b;
+        }
+        .step-completed .step-icon-bg {
+            background: #22c55e !important; /* Green success */
+            transform: scale(1.1);
+        }
+
+        /* Custom Slider Range */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #06b6d4;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+        
+        /* Floating Progress */
+        .progress-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            z-index: 1000;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #0ea5e9, #22c55e);
+            transition: width 0.4s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container shadow-sm">
+        <div class="progress-bar-fill" id="mainProgress"></div>
+    </div>
+
+    <!-- Encabezado con Degradado -->
+    <header class="bg-gradient-primary text-white pt-20 pb-16 px-4 shadow-xl relative overflow-hidden">
+        <!-- Decoraciones de fondo -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+            <div class="absolute w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -top-20 -left-20"></div>
+            <div class="absolute w-96 h-96 bg-white opacity-10 rounded-full blur-3xl bottom-10 right-10"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <span class="inline-block py-1 px-3 rounded-full bg-white/20 text-white text-sm font-semibold mb-4 backdrop-blur-sm border border-white/30">
+                Formula Maisua
+            </span>
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-white">Glizerina Xaboi</span><br/>Gardena
+            </h1>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto opacity-95 font-light">
+                Bihurtu xaboi komertzial bat glizerina-oinarri garden eta elastiko metodo interaktibo honekin. Jarraitu errezeta eta markatu urratsak aurrera egin ahala.
+            </p>
+            <div class="mt-8 animate-bounce">
+                <i data-lucide="chevron-down" class="mx-auto w-8 h-8 opacity-80"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-16">
+        
+        <!-- Calculadora Interactiva -->
+        <section class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 mb-20 border border-slate-100 relative overflow-hidden transform transition-all hover:shadow-cyan-100/50">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-100 to-transparent rounded-bl-full z-0 opacity-50"></div>
+            
+            <h2 class="text-3xl font-bold mb-8 flex items-center z-10 relative text-slate-800">
+                <i data-lucide="calculator" class="w-8 h-8 mr-3 text-cyan-500"></i>
+                <span class="text-gradient">Kalkulagailu Dinamikoa</span>
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-10 relative z-10">
+                <div class="flex flex-col justify-center">
+                    <label class="block text-lg font-semibold text-slate-700 mb-4">
+                        Zenbat Lagarto xaboi zuri erabiliko duzu?
+                    </label>
+                    
+                    <!-- Controles interactivos -->
+                    <div class="flex items-center mb-6">
+                        <input type="number" id="baseInputNumber" value="105" min="10" max="2000" class="w-32 text-2xl font-bold p-3 border-2 border-cyan-200 rounded-xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all outline-none text-center shadow-inner text-cyan-700">
+                        <span class="ml-4 font-medium text-slate-500 text-xl">gramo</span>
+                    </div>
+
+                    <input type="range" id="baseInputSlider" value="105" min="10" max="1000" step="5" class="mb-4">
+                    <p class="text-sm text-slate-400 font-medium flex items-center">
+                        <i data-lucide="info" class="w-4 h-4 mr-1"></i> Irristatu doitzeko. Jatorrizko errezetak 105g erabiltzen ditu.
+                    </p>
+                </div>
+
+                <!-- Tarjeta de Ingredientes -->
+                <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-cyan-300 transition-colors">
+                    <div class="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <i data-lucide="beaker" class="w-32 h-32"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-4 text-slate-800 border-b border-slate-200 pb-2">Beharko dituzu:</h3>
+                    <ul class="space-y-3 text-slate-600 font-medium">
+                        <li class="flex justify-between items-center group/item hover:bg-white p-2 rounded-lg transition-colors">
+                            <span class="flex items-center"><i data-lucide="box" class="w-5 h-5 mr-2 text-cyan-500"></i> Lagarto Xaboia</span> 
+                            <span id="valJabon" class="font-bold text-lg text-slate-800 transition-all">105 g</span>
+                        </li>
+                        <li class="flex justify-between items-center group/item hover:bg-white p-2 rounded-lg transition-colors">
+                            <span class="flex items-center"><i data-lucide="cuboid" class="w-5 h-5 mr-2 text-orange-400"></i> Azukre Zuria</span> 
+                            <span id="valAzucar" class="font-bold text-lg text-slate-800 transition-all">105 g</span>
+                        </li>
+                        <li class="flex justify-between items-center group/item hover:bg-white p-2 rounded-lg transition-colors">
+                            <span class="flex items-center"><i data-lucide="droplet" class="w-5 h-5 mr-2 text-blue-400"></i> Ur Destilatua</span> 
+                            <span id="valAgua" class="font-bold text-lg text-slate-800 transition-all">105 ml</span>
+                        </li>
+                        <li class="flex justify-between items-center group/item hover:bg-white p-2 rounded-lg transition-colors">
+                            <span class="flex items-center"><i data-lucide="leaf" class="w-5 h-5 mr-2 text-emerald-500"></i> Glizerina Begetala</span> 
+                            <span id="valGlicerina" class="font-bold text-lg text-slate-800 transition-all">26.0 g</span>
+                        </li>
+                        <li class="flex justify-between items-center group/item hover:bg-white p-2 rounded-lg transition-colors">
+                            <span class="flex items-center"><i data-lucide="flame" class="w-5 h-5 mr-2 text-red-400"></i> 96º-ko Alkohola</span> 
+                            <span id="valAlcohol" class="font-bold text-lg text-slate-800 transition-all">75 g</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Indicador de progreso -->
+        <div class="sticky top-4 z-50 bg-white/80 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-slate-200 max-w-max mx-auto mb-10 flex items-center space-x-3 transition-all" id="progressPill">
+            <i data-lucide="check-circle-2" class="text-cyan-500"></i>
+            <span class="font-bold text-slate-700">Aurrerapena: <span id="progressText" class="text-cyan-600">0/10</span> Urrats</span>
+        </div>
+
+        <!-- Cronograma (Timeline) -->
+        <div class="relative timeline-container py-8" id="timeline">
+            
+            <!-- Paso 1 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="1">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-gradient-accent text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="chef-hat" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">1. Prestaketa</h3>
+                            <span class="text-slate-300 font-bold text-4xl opacity-50">01</span>
+                        </div>
+                        <p class="text-slate-600 mb-4 text-lg">Pisatu zehatz-mehatz Lagarto xaboia. Ebaki zati txiki-txikietan edo, are hobeto, <strong class="text-cyan-600">birrindu ezazu</strong>.</p>
+                        <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+                            <p class="text-sm text-yellow-800"><span class="font-bold flex items-center mb-1"><i data-lucide="lightbulb" class="w-4 h-4 mr-1"></i> Trikimailua:</span> Birrintzeak pikorrik ez egotea saihestuko du eta sutan behar den denbora asko murriztuko du.</p>
+                        </div>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-cyan-400 hover:text-cyan-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="2">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-gradient-accent text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="thermometer" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">2. Sutara</h3>
+                            <span class="text-slate-300 font-bold text-4xl opacity-50">02</span>
+                        </div>
+                        <p class="text-slate-600 text-lg">Jarri lapiko bat sutan <strong class="text-red-500">gehienera</strong>. Gehitu ur destilatua eta, jarraian, birrindutako xaboia.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-cyan-400 hover:text-cyan-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="3">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-gradient-accent text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="cup-soda" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">3. Azukrea gehitu</h3>
+                            <span class="text-slate-300 font-bold text-4xl opacity-50">03</span>
+                        </div>
+                        <p class="text-slate-600 text-lg">Itxaron ura berotzen hasi eta pixka bat irakiten hasi arte (txup-txup). Une horretan, bota azukre zuri guztia.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-cyan-400 hover:text-cyan-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 4 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="4">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-orange-500 text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="flame-kindling" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border-2 border-orange-100 transition-all duration-300 hover:shadow-2xl hover:border-orange-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">4. Fase Kritikoa</h3>
+                            <span class="text-orange-200 font-bold text-4xl opacity-50">04</span>
+                        </div>
+                        <p class="text-orange-600 font-bold mb-2 text-lg">Jaitsi sua erdira berehala!</p>
+                        <p class="text-slate-600">Eragin etengabe koilara batekin dena guztiz disolbatu eta ahia lodi bat sortu arte. Pazientzia behar da.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-orange-400 hover:text-orange-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 5 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="5">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-gradient-accent text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="droplet" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">5. Glizerina</h3>
+                            <span class="text-slate-300 font-bold text-4xl opacity-50">05</span>
+                        </div>
+                        <p class="text-slate-600 text-lg">Gehitu glizerina begetala ahi beroari. Testura aldatzen dela nabarituko duzu, arinagoa eta krematsuagoa bihurtuz.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-cyan-400 hover:text-cyan-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 6 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="6">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-red-500 text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="flask-conical" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border-2 border-red-100 transition-all duration-300 hover:shadow-2xl hover:border-red-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">6. Erreakzio Kimikoa</h3>
+                            <span class="text-red-200 font-bold text-4xl opacity-50">06</span>
+                        </div>
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded-r-xl">
+                            <p class="text-sm text-red-800"><span class="font-bold flex items-center mb-1"><i data-lucide="alert-triangle" class="w-4 h-4 mr-1"></i> Kontuz:</span> Alkohola sukoia da eta lurrunak sortzen ditu. Ondo aireztatu. Kantitate handia egiten baduzu, urrundu lapikoa sutatik une batez.</p>
+                        </div>
+                        <p class="text-slate-600 mb-2">Bota alkoholaren <strong class="text-slate-800">erdia</strong>. Nahasketa "argitzen" hasiko da. Eragin pixka bat eta bota gainerakoa.</p>
+                        <p class="text-slate-600">Jarraitu eragiten erdia baino gehiago argitu (garden bihurtu) arte.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-red-400 hover:text-red-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 7 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="7">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-gradient-accent text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="layout-grid" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">7. Moldean jarri eta Iragazi</h3>
+                            <span class="text-slate-300 font-bold text-4xl opacity-50">07</span>
+                        </div>
+                        <p class="text-slate-600 text-lg">Prestatu zure moldea erretilu zurrun baten gainean. Bota nahasketa likidoa <strong>iragazki</strong> batetik pasatuz, gera daitekeen edozein pikor harrapatzeko.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-cyan-400 hover:text-cyan-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 8 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="8">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-gradient-accent text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="spray-can" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">8. Burbuilarik gabe</h3>
+                            <span class="text-slate-300 font-bold text-4xl opacity-50">08</span>
+                        </div>
+                        <p class="text-slate-600 text-lg">Bota eta berehala, lainoztatu gainazala alkoholekin sprayan. Burbuilak berehala desagertuko dira.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-cyan-400 hover:text-cyan-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 9 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="9">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-gradient-accent text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="clock" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-slate-800 transition-colors">9. Lehortzea</h3>
+                            <span class="text-slate-300 font-bold text-4xl opacity-50">09</span>
+                        </div>
+                        <p class="text-slate-600 text-lg">Utzi atseden hartzen mugitu gabe. <strong class="text-slate-800">4 edo 5 ordu</strong> beharko ditu guztiz solidotzeko, klimaren arabera.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-cyan-400 hover:text-cyan-600 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 10 -->
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group mb-16 step-wrapper" data-step="10">
+                <div class="step-icon-bg flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white font-bold border-4 border-white shadow-xl z-10 absolute left-5 md:left-1/2 transform md:-translate-x-1/2 transition-all duration-300">
+                    <i data-lucide="package-check" class="w-6 h-6 step-icon-default"></i>
+                    <i data-lucide="check" class="w-6 h-6 step-icon-done hidden"></i>
+                </div>
+                <div class="w-full pl-24 md:pl-0 md:w-5/12 step-card">
+                    <div class="card-content bg-blue-50 p-6 md:p-8 rounded-3xl shadow-xl border-2 border-blue-200 transition-all duration-300 hover:shadow-2xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="step-title text-2xl font-bold text-blue-900 transition-colors">10. Kontserbazioa</h3>
+                            <span class="text-blue-200 font-bold text-4xl opacity-50">10</span>
+                        </div>
+                        <p class="text-blue-800 font-bold mb-2 text-lg">Ezinbesteko urratsa hondatu ez dadin!</p>
+                        <p class="text-blue-700 mb-2">Behin solidoa denean, atera moldetik eta berehala <strong>bildu film paper gardenean</strong>.</p>
+                        <p class="text-sm text-blue-600">Aire librean uzten baduzu, hezetasuna galduko du eta opaku eta itsusi bihurtuko da.</p>
+                        <button class="mt-6 w-full py-3 rounded-xl border-2 border-blue-200 text-blue-700 font-bold hover:bg-white hover:border-blue-400 transition-all flex justify-center items-center gap-2 btn-complete">
+                            <i data-lucide="circle" class="w-5 h-5 icon-unchecked"></i> Eginda markatu
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+    </main>
+
+    <!-- Footer Banner -->
+    <footer class="bg-gradient-primary text-white py-16 relative overflow-hidden mt-10">
+        <div class="max-w-3xl mx-auto px-4 text-center relative z-10">
+            <div class="inline-block bg-white/20 p-4 rounded-full mb-6 backdrop-blur-sm border border-white/30">
+                <i data-lucide="sparkles" class="w-10 h-10 text-yellow-300"></i>
+            </div>
+            <h3 class="text-4xl font-extrabold mb-4">Zorionak, oinarria prest duzu!</h3>
+            <p class="text-lg opacity-90 max-w-xl mx-auto font-light leading-relaxed">
+                Orain glizerina-xaboi elastiko eta gardena duzu, urtu eta kolore, usain eta esfoliatzaileekin aberasteko prest.
+            </p>
+        </div>
+        <!-- Decoración -->
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-30 z-0"></div>
+    </footer>
+
+    <script>
+        // Inicializar Iconos
+        lucide.createIcons();
+
+        // 1. Calculadora Dinámica (Sincronización Input/Slider)
+        const numInput = document.getElementById('baseInputNumber');
+        const sliderInput = document.getElementById('baseInputSlider');
+        
+        const ratios = {
+            azucar: 1,           
+            agua: 1,             
+            glicerina: 0.2476,   
+            alcohol: 0.7142      
+        };
+
+        function updateIngredients(val) {
+            let baseWeight = parseFloat(val);
+            if (isNaN(baseWeight) || baseWeight < 0) baseWeight = 0;
+
+            // Actualizar textos con animación suave en CSS (ya tienen transition-all)
+            document.getElementById('valJabon').textContent = `${baseWeight.toFixed(0)} g`;
+            document.getElementById('valAzucar').textContent = `${(baseWeight * ratios.azucar).toFixed(0)} g`;
+            document.getElementById('valAgua').textContent = `${(baseWeight * ratios.agua).toFixed(0)} ml`;
+            document.getElementById('valGlicerina').textContent = `${(baseWeight * ratios.glicerina).toFixed(1)} g`;
+            document.getElementById('valAlcohol').textContent = `${(baseWeight * ratios.alcohol).toFixed(0)} g`;
+        }
+
+        numInput.addEventListener('input', (e) => {
+            sliderInput.value = e.target.value;
+            updateIngredients(e.target.value);
+        });
+
+        sliderInput.addEventListener('input', (e) => {
+            numInput.value = e.target.value;
+            updateIngredients(e.target.value);
+        });
+
+        // 2. Interacciones del Timeline (Marcar como completado)
+        const stepWrappers = document.querySelectorAll('.step-wrapper');
+        const mainProgress = document.getElementById('mainProgress');
+        const progressText = document.getElementById('progressText');
+        let completedCount = 0;
+        const totalSteps = stepWrappers.length;
+
+        stepWrappers.forEach(wrapper => {
+            const btn = wrapper.querySelector('.btn-complete');
+            const iconDefault = wrapper.querySelector('.step-icon-default');
+            const iconDone = wrapper.querySelector('.step-icon-done');
+            const btnIconUnchecked = wrapper.querySelector('.icon-unchecked');
+            
+            btn.addEventListener('click', () => {
+                const isCompleted = wrapper.classList.toggle('step-completed');
+                
+                if(isCompleted) {
+                    // Cambiar estado a Completado
+                    iconDefault.classList.add('hidden');
+                    iconDone.classList.remove('hidden');
+                    btn.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5 text-green-600"></i> Eginda`;
+                    btn.classList.add('border-green-400', 'bg-green-50', 'text-green-700');
+                    completedCount++;
+                } else {
+                    // Revertir estado
+                    iconDefault.classList.remove('hidden');
+                    iconDone.classList.add('hidden');
+                    btn.innerHTML = `<i data-lucide="circle" class="w-5 h-5"></i> Eginda markatu`;
+                    btn.classList.remove('border-green-400', 'bg-green-50', 'text-green-700');
+                    completedCount--;
+                }
+                
+                // Refrescar iconos inyectados por Lucide
+                lucide.createIcons();
+                
+                // Actualizar Barra de Progreso
+                const percentage = (completedCount / totalSteps) * 100;
+                mainProgress.style.width = `${percentage}%`;
+                progressText.textContent = `${completedCount}/${totalSteps}`;
+            });
+        });
+
+        // 3. Animaciones al hacer Scroll (Intersection Observer)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Añade la clase que dispara la animación en CSS
+                    entry.target.querySelector('.step-card').classList.add('is-visible');
+                    // Opcional: dejar de observar si solo queremos que se anime una vez
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        stepWrappers.forEach(wrapper => {
+            observer.observe(wrapper);
+        });
+
+    </script>
+</body>
+</html>
